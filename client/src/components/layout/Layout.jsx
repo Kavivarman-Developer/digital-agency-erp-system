@@ -11,7 +11,7 @@ export default function Layout({ children }) {
 
         <Navbar />
 
-        <div className="p-6">
+        <div className="p-6 overflow-auto" style={{ maxHeight: "calc(100vh - 64px)" }}>
           {children}
         </div>
 

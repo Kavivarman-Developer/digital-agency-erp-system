@@ -73,7 +73,10 @@ export default function Admin() {
         </BarChart>
       </div> */}
 
-      <LoginHistory />
+      <div className="grid grid-cols-1 gap-6 mt-6">
+        <LoginHistory />
+      </div>
+
       // 👉 Recent Task Activity
       <div className="bg-white p-5 rounded-xl shadow mt-6">
         <h2 className="text-xl font-bold mb-4">Recent Task Activity</h2>
@@ -89,12 +92,12 @@ export default function Admin() {
           </thead>
 
           <tbody>
-            {tasks.slice().reverse().slice(0,10).map(t => (
+            {tasks.slice().reverse().slice(0, 10).map(t => (
               <tr key={t._id} className="border-b hover:bg-gray-50">
                 <td>{t.title}</td>
                 <td>{t.assignedTo?.[0]?.name || t.assignedTo?.[0]?.email}</td>
                 <td>{t.status}</td>
-                <td>{t.completedAt ? t.completedAt.slice(0,10) : "-"}</td>
+                <td>{t.completedAt ? t.completedAt.slice(0, 10) : "-"}</td>
               </tr>
             ))}
           </tbody>

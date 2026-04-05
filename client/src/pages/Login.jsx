@@ -22,7 +22,7 @@ export default function Login() {
 
     const login = async () => {
         if (!email || !password) {
-            showToast("All fields required");
+            showToast("All fields required", "error");
             return;
         }
         try {

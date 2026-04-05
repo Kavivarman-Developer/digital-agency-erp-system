@@ -16,9 +16,6 @@ export default function Clients() {
 
   const [editId, setEditId] = useState(null);
 
-  useEffect(() => {
-    fetchClients();
-  }, []);
 
   const fetchClients = async () => {
     const res = await axios.get("http://localhost:5000/api/clients", {
@@ -79,6 +76,10 @@ export default function Clients() {
 
     fetchClients();
   };
+
+    useEffect(() => {
+    fetchClients();
+  }, []);
 
   return (
     <Layout>

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 
 export default function LoginHistory() {
+
   const [logs, setLogs] = useState([]);
   const [filteredLogs, setFilteredLogs] = useState([]);
 
@@ -9,7 +10,11 @@ export default function LoginHistory() {
   const [date, setDate] = useState("");
 
   const [currentPage, setCurrentPage] = useState(1);
-  const logsPerPage = 5;
+
+
+  const [itemsPerPage, setItemsPerPage] = useState(5);
+
+  const pageSizes = [5, 10, 25, 50, 100];
 
   useEffect(() => {
     fetchLogs();
@@ -52,11 +57,13 @@ export default function LoginHistory() {
   };
 
   // 📄 Pagination logic
-  const indexOfLast = currentPage * logsPerPage;
-  const indexOfFirst = indexOfLast - logsPerPage;
-  const currentLogs = filteredLogs.slice(indexOfFirst, indexOfLast);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = currentPage * itemsPerPage;
 
-  const totalPages = Math.ceil(filteredLogs.length / logsPerPage);
+  const paginatedData = filteredLogs.slice(startIndex, endIndex);
+
+  const totalItems = filteredLogs.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
 
   return (
     <div className="bg-white p-5 rounded-xl shadow">
@@ -78,6 +85,20 @@ export default function LoginHistory() {
           onChange={(e) => setDate(e.target.value)}
         />
 
+        <select
+          value={itemsPerPage}
+          onChange={(e) => {
+            setItemsPerPage(Number(e.target.value));
+            setCurrentPage(1);
+          }}
+        >
+          {pageSizes.map((size) => (
+            <option key={size} value={size}>
+              {size}
+            </option>
+          ))}
+        </select>
+
       </div>
 
       {/* 📊 Table */}
@@ -92,7 +113,7 @@ export default function LoginHistory() {
         </thead>
 
         <tbody>
-          {currentLogs.map((log, i) => (
+          {paginatedData.map((log, i) => (
             <tr key={i} className="border-b hover:bg-gray-50">
               <td className="py-2">{log.email}</td>
               <td>{log.role}</td>
@@ -115,7 +136,7 @@ export default function LoginHistory() {
         </button>
 
         <span className="px-3 py-1">
-          {currentPage} / {totalPages}
+         {filteredLogs.length} - {currentPage} / {totalPages}
         </span>
 
         <button

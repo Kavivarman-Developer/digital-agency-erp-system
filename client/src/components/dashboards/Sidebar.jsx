@@ -1,10 +1,25 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { logout } from "../../utils/auth";
+import { useState } from "react";
 
 export default function Sidebar() {
     const navigate = useNavigate();
+    const location = useLocation();
+
     const role = localStorage.getItem("role");
 
+    const getClass = (path) => `
+      cursor-pointer 
+      ${location.pathname === path ?
+            "font-bold text-blue-600 bg-gray-800 p-2 rounded"
+            : "hover:bg-gray-700 p-2 rounded"}
+    `;
+    const menuItems = [
+        { label: "Dashboard", path: "/admin" },
+        { label: "Clients", path: "/clients" },
+        { label: "Projects", path: "/projects" },
+        { label: "Tasks", path: "/tasks" },
+    ];
 
     return (
         <div className="w-64 h-screen bg-gray-900 text-white p-5">
@@ -14,38 +29,28 @@ export default function Sidebar() {
             <ul className="space-y-4">
 
                 {/* 🔥 ADMIN */}
-                {role === "admin" && (
-                    <>
-                        <li onClick={() => navigate("/admin")} className="cursor-pointer">
-                            Dashboard
-                        </li>
-
-                        <li onClick={() => navigate("/clients")} className="cursor-pointer">
-                            Clients
-                        </li>
-
-                        <li onClick={() => navigate("/projects")} className="cursor-pointer">
-                            Projects
-                        </li>
-
-                        <li onClick={() => navigate("/tasks")} className="cursor-pointer">
-                            Tasks
-                        </li>
-                    </>
-                )}
+                {role === "admin" && menuItems.map((item) => (
+                    <li
+                        key={item.path}
+                        onClick={() => navigate(item.path)}
+                        className={getClass(item.path)}
+                    >
+                        {item.label}
+                    </li>
+                ))}
 
                 {/* 🔥 MANAGER */}
                 {role === "manager" && (
                     <>
-                        <li onClick={() => navigate("/manager")} className="cursor-pointer">
+                        <li onClick={() => navigate("/manager")} className={getClass("/manager")}>
                             Manager Panel
                         </li>
 
-                        <li onClick={() => navigate("/projects")} className="cursor-pointer">
+                        <li onClick={() => navigate("/projects")} className={getClass("/projects")}>
                             Projects
                         </li>
 
-                        <li onClick={() => navigate("/tasks")} className="cursor-pointer">
+                        <li onClick={() => navigate("/tasks")} className={getClass("/tasks")}>
                             Tasks
                         </li>
                     </>
@@ -54,7 +59,7 @@ export default function Sidebar() {
                 {/* 🔥 USER (ONLY THIS 🔥) */}
                 {role === "user" && (
                     <>
-                        <li onClick={() => navigate("/user")} className="cursor-pointer font-bold text-blue-600">
+                        <li onClick={() => navigate("/user")} className={getClass("/user")}>
                             User Home
                         </li>
                     </>
@@ -63,8 +68,7 @@ export default function Sidebar() {
                 {/* 🚪 LOGOUT */}
                 <li
                     onClick={() => {
-                        localStorage.clear();
-                        window.location.href = "/";
+                        logout();
                     }}
                     className="text-red-500 cursor-pointer mt-10"
                 >
