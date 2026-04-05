@@ -19,6 +19,7 @@ export default function Sidebar() {
         { label: "Clients", path: "/clients" },
         { label: "Projects", path: "/projects" },
         { label: "Tasks", path: "/tasks" },
+        { label: "Leaves", path: "/leaves" },
     ];
 
     return (
@@ -52,6 +53,10 @@ export default function Sidebar() {
 
                         <li onClick={() => navigate("/tasks")} className={getClass("/tasks")}>
                             Tasks
+                        </li>
+
+                         <li onClick={() => navigate("/leaves")} className={getClass("/leaves")}>
+                            Leaves
                         </li>
                     </>
                 )}

@@ -9,6 +9,7 @@ import Clients from "./pages/Clients";
 import Projects from "./pages/Projects";
 import Tasks from "./pages/Tasks";
 import { Toaster } from "react-hot-toast";
+import Leaves from "./pages/Leaves";
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
           <Route path="/clients" element={<Clients />} />
           <Route path="/projects" element={<Projects />} />
           <Route path="/tasks" element={<Tasks />} />
+          <Route path="/leaves" element={<Leaves />} />
           <Route
             path="/admin"
             element={

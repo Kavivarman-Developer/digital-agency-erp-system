@@ -4,16 +4,12 @@ import axios from "axios";
 const API = "http://localhost:5000/api/tasks";
 
 export const fetchMyTasks = createAsyncThunk("tasks/fetchMy", async () => {
-  const res = await axios.get(`${API}/my`, {
-    headers: { Authorization: localStorage.getItem("token") }
-  });
+  const res = await axios.get(`${API}/my`);
   return res.data;
 });
 
 export const completeTask = createAsyncThunk("tasks/complete", async (taskId) => {
-  const res = await axios.post(`${API}/${taskId}/complete`, {}, {
-    headers: { Authorization: localStorage.getItem("token") }
-  });
+  const res = await axios.post(`${API}/${taskId}/complete`, {});
   return res.data;
 });
 
