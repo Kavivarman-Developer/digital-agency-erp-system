@@ -12,21 +12,13 @@ export default function Manager() {
   }, []);
 
   const fetchClients = async () => {
-    const res = await axios.get("http://localhost:5000/api/clients", {
-      headers: {
-        Authorization: localStorage.getItem("token")
-      }
-    });
+    const res = await axios.get("http://localhost:5000/api/clients");
 
     setClients(res.data);
   };
 
   const fetchMyAssignedTasks = async () => {
-    const res = await axios.get("http://localhost:5000/api/tasks?assignedBy=my", {
-      headers: {
-        Authorization: localStorage.getItem("token")
-      }
-    });
+    const res = await axios.get("http://localhost:5000/api/tasks?assignedBy=my");
 
     setTasks(res.data);
   };
