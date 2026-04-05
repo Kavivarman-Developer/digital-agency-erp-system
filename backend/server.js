@@ -17,5 +17,6 @@ app.use("/api/clients", require("./src/routes/clientRoutes"));
 app.use("/api/projects", require("./src/routes/projectRoutes"));
 app.use("/api/tasks", require("./src/routes/taskRoutes"));
 app.use("/api/users", require("./src/routes/userRoutes"));
+app.use("/api/leaves", require("./src/routes/leaveRouter"));
 
 app.listen(5000, () => console.log("Server running"));
