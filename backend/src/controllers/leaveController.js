@@ -1,4 +1,5 @@
 const leaves = require('../models/leaveModel');
+const sendWhatsAppMessage = require("../services/whatsappService");
 
 
 const applyLeave = async (req, res) => {
@@ -7,8 +8,8 @@ const applyLeave = async (req, res) => {
 
         // ✅ CORRECTED: Added input validation
         if (!fromDate || !toDate || !reason) {
-            return res.status(400).json({ 
-                message: 'fromDate, toDate, and reason are required' 
+            return res.status(400).json({
+                message: 'fromDate, toDate, and reason are required'
             });
         }
 
@@ -19,14 +20,14 @@ const applyLeave = async (req, res) => {
         today.setHours(0, 0, 0, 0);
 
         if (startDate < today) {
-            return res.status(400).json({ 
-                message: 'Leave start date cannot be in the past' 
+            return res.status(400).json({
+                message: 'Leave start date cannot be in the past'
             });
         }
 
         if (endDate < startDate) {
-            return res.status(400).json({ 
-                message: 'End date must be after start date' 
+            return res.status(400).json({
+                message: 'End date must be after start date'
             });
         }
 
@@ -40,12 +41,13 @@ const applyLeave = async (req, res) => {
         });
 
         if (existingLeave) {
-            return res.status(400).json({ 
-                message: 'You already have a leave request during this period' 
+            return res.status(400).json({
+                message: 'You already have a leave request during this period'
             });
         }
 
         // ✅ CORRECTED: Create leave with explicit status
+        // CHANGE: Set initial status to 'pending' for manager approval workflow
         const leave = new leaves({
             employeeId: req.user.id,
             fromDate: startDate,
@@ -55,9 +57,9 @@ const applyLeave = async (req, res) => {
         });
 
         await leave.save();
-        res.status(201).json({ 
-            message: 'Leave applied successfully', 
-            leave 
+        res.status(201).json({
+            message: 'Leave applied successfully',
+            leave
         });
     } catch (error) {
         console.error(error);
@@ -81,15 +83,17 @@ const getMyLeaves = async (req, res) => {
 // ✅ NEW: Fetch all users' leaves (for managers/admins)
 const getAllLeaves = async (req, res) => {
     try {
-        // ✅ Populate employeeId with user details (name, email, etc.)
+        // ✅ FIX: Populate employeeId with user details including PHONE for WhatsApp
+        // Added 'phone' field to enable WhatsApp notifications in approve functions
         const allLeaves = await leaves
             .find()
-            .populate('employeeId', 'name email role') // Get name, email, role from User
+            .populate('employeeId', 'name email phone role') // Get name, email, phone, role from User
             .sort({ createdAt: -1 }); // Sort by newest first
 
+        console.log(`\\n✅ Fetched ${allLeaves.length} leaves with employee details`);
         res.status(200).json({ allLeaves });
     } catch (error) {
-        console.error(error);
+        console.error('❌ Error fetching all leaves:', error);
         res.status(500).json({ message: 'Internal server error' });
     }
 }
@@ -101,22 +105,140 @@ const upadateLeaveStatus = async (req, res) => {
         const leave = await leaves.findByIdAndUpdate(
             leaveId,
             { status },
-            { new: true }
-        );
+            { returnDocument: 'after' } // ✅ correct (no warning)
+        ).populate('employeeId', 'name phone');
+
+        // ✅ ADD DEBUG HERE 👇
+        console.log("Leave employeeId:", leave.employeeId?._id);
+        console.log("Phone:", leave.employeeId?.phone);
+
         if (!leave) {
             return res.status(404).json({ message: 'Leave not found' });
         }
-        res.status(200).json({ message: 'Leave status updated successfully', leave });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Internal server error' });
 
+        // 🔍 DEBUG (VERY IMPORTANT)
+        console.log("👉 Employee:", leave.employeeId);
+        console.log("👉 Phone:", leave.employeeId?.phone);
+        console.log("👉 Status:", status);
+
+        // ✅ STRICT VALIDATION (FIXED LOGIC)
+        // NOTE: If phone is undefined here, the User record is missing a phone value.
+        // The leave itself can still be approved, but WhatsApp cannot be sent.
+        if (
+            status === 'approved' &&
+            leave.employeeId &&
+            leave.employeeId.phone
+        ) {
+            const rawPhone = leave.employeeId.phone.toString().trim();
+            const phone = rawPhone.startsWith("+91")
+                ? rawPhone
+                : rawPhone.startsWith("+")
+                    ? rawPhone
+                    : `+91${rawPhone}`;
+
+            console.log("📱 Sending to:", phone);
+
+            try {
+                console.log("🚀 Sending WhatsApp...");
+
+                await sendWhatsAppMessage(
+                    phone,
+                    `Hi ${leave.employeeId.name}, your leave approved ✅`
+                );
+
+                console.log("✅ WhatsApp sent successfully");
+
+            } catch (err) {
+                console.error("❌ WhatsApp Error:", err.message);
+            }
+        } else {
+            console.warn("❌ WhatsApp skipped due to:");
+            console.warn("   - Status:", status);
+            console.warn("   - Employee exists:", !!leave.employeeId);
+            console.warn("   - Phone exists:", !!leave.employeeId?.phone);
+            console.warn("   - Phone value:", leave.employeeId?.phone);
+            console.warn("   - Fix: add phone to the User record or register user with phone.");
+        }
+
+        res.status(200).json({
+            message: 'Leave status updated successfully',
+            leave
+        });
+
+    } catch (error) {
+        console.error("❌ Update Error:", error);
+        res.status(500).json({ message: 'Internal server error' });
     }
-}
+};
+
+const approveLeave = async (req, res) => {
+    try {
+        const leaveId = req.params.id;
+
+        const leave = await leaves
+            .findById(leaveId)
+            .populate('employeeId', 'name phone');
+
+        if (!leave) {
+            return res.status(404).json({ message: "Leave not found" });
+        }
+
+        // ✅ Update status
+        leave.status = "approved";
+        await leave.save();
+
+        // 🔥 DEBUG (VERY IMPORTANT)
+        console.log("👉 Employee:", leave.employeeId);
+        console.log("👉 Phone:", leave.employeeId?.phone);
+
+        // ✅ STRICT VALIDATION (FIXED)
+        // NOTE: If phone is undefined here, the User record is missing a phone value.
+        if (
+            leave.employeeId &&
+            leave.employeeId.phone
+        ) {
+            const rawPhone = leave.employeeId.phone.toString().trim();
+            const phone = rawPhone.startsWith("+91")
+                ? rawPhone
+                : rawPhone.startsWith("+")
+                    ? rawPhone
+                    : `+91${rawPhone}`;
+
+            console.log("📱 Sending to:", phone);
+
+            try {
+                console.log("🚀 Sending WhatsApp...");
+                await sendWhatsAppMessage(
+                    phone,
+                    `Hi ${leave.employeeId.name}, your leave approved ✅`
+                );
+                console.log("✅ WhatsApp sent successfully");
+            } catch (err) {
+                console.error("❌ WhatsApp Error:", err.message);
+            }
+        } else {
+            console.warn("❌ Invalid or missing phone → WhatsApp skipped");
+            console.warn("   - Employee exists:", !!leave.employeeId);
+            console.warn("   - Phone exists:", !!leave.employeeId?.phone);
+            console.warn("   - Phone value:", leave.employeeId?.phone);
+            console.warn("   - Fix: add phone to the User record or register user with phone.");
+        }
+
+        res.json({
+            message: "Leave approved successfully",
+            leave
+        });
+
+    } catch (error) {
+        console.error("❌ Approve Error:", error);
+        res.status(500).json({ error: error.message });
+    }
+};
 
 module.exports = {
     applyLeave,
     getMyLeaves,
     getAllLeaves,
-    upadateLeaveStatus
+    upadateLeaveStatus,
+    approveLeave
 };

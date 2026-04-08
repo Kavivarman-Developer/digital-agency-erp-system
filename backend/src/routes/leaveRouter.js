@@ -1,7 +1,8 @@
 const express = require('express');
+
 const router = express.Router();
 
-const { applyLeave, getMyLeaves, getAllLeaves, upadateLeaveStatus } = require('../controllers/leaveController');
+const { applyLeave, getMyLeaves, getAllLeaves, upadateLeaveStatus, approveLeave } = require('../controllers/leaveController');
 
 // ✅ CORRECTED: Changed 'authenticateUser' to 'verifyToken' (correct export from authMiddleware)
 const { verifyToken, authorizeRoles } = require('../middleware/authMiddleware');
@@ -21,5 +22,13 @@ router.put(
     upadateLeaveStatus
 );
 
+
+// ✅ CHANGE: Added authorization middleware for manager approval
+// Only managers and admins can approve leaves
+router.put("/approve/:id", 
+    verifyToken, 
+    authorizeRoles('admin', 'manager'), 
+    approveLeave
+);
 
 module.exports = router;

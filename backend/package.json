@@ -11,7 +11,7 @@
     "basic-auth": "^2.0.1",
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
-    "dotenv": "^17.3.1",
+    "dotenv": "^17.4.1",
     "express": "^5.2.1",
     "get-proto": "^1.0.1",
     "glob-parent": "^5.1.2",
@@ -33,6 +33,7 @@
     "side-channel-map": "^1.0.1",
     "supports-color": "^5.5.0",
     "toidentifier": "^1.0.1",
+    "twilio": "^5.13.1",
     "validator": "^13.15.26",
     "whatwg-url": "^14.2.0"
   },

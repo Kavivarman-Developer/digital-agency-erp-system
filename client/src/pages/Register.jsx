@@ -6,13 +6,14 @@ export default function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [phone, setPhone] = useState("");  // ✅ NEW: Phone number state
   const [role, setRole] = useState("user");
 
   const navigate = useNavigate();
 
   const register = async () => {
-    if (!name || !email || !password) {
-      alert("All fields required");
+    if (!name || !email || !password || !phone) {
+      alert("All fields required");  // ✅ CHANGE: Added phone validation
       return;
     }
     try {
@@ -20,6 +21,7 @@ export default function Register() {
         name,
         email,
         password,
+        phone,  // ✅ CHANGE: Added phone to API request
         role
       });
 
@@ -88,6 +90,13 @@ export default function Register() {
             placeholder="Password"
             className="w-full p-3 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             onChange={(e) => setPassword(e.target.value)}
+          />
+
+          {/* ✅ NEW: Phone Number Input */}
+          <input
+            placeholder="Phone Number (e.g., +919943958576)"
+            className="w-full p-3 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            onChange={(e) => setPhone(e.target.value)}
           />
 
           {/* Role Dropdown */}

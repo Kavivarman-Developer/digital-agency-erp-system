@@ -6,7 +6,12 @@ const LoginHistory = require("../models/LoginHistory");
 // REGISTER
 exports.register = async (req, res) => {
     try {
-        const { name, email, password, role } = req.body;
+        const { name, email, password, phone, role } = req.body;
+
+        // ✅ VALIDATION: phone is required for WhatsApp notifications
+        if (!name || !email || !password || !phone) {
+            return res.status(400).json("Name, email, password and phone are required");
+        }
 
         // check existing user
         const exists = await User.findOne({ email });
@@ -15,11 +20,12 @@ exports.register = async (req, res) => {
         // hash password
         const hashed = await bcrypt.hash(password, 10);
 
-        // create user
+        // create user with phone field included
         const user = await User.create({
             name,
             email,
             password: hashed,
+            phone, // ✅ SAVE: Store user phone for WhatsApp
             role
         });
 
