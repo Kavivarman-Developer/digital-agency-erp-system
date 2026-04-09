@@ -3,6 +3,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { applyLeave, fetchLeaves } from '../../features/leaveSlice';
 
 const LeaveFormModal = ({ isOpen, onClose }) => {
+
+    // ✅ Redux hooks
     const dispatch = useDispatch();
     const { loading, error } = useSelector(state => state.leave);
 
