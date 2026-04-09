@@ -109,7 +109,7 @@ const LeaveFormModal = ({ isOpen, onClose }) => {
                             />
                         </div>
 
-                        {/* To Date */}
+                        {/* To Date ..*/}
                         <div>
                             <label className="block font-semibold text-gray-700 mb-2">📅 To Date <span className="text-red-500">*</span></label>
                             <input
