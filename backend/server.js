@@ -13,7 +13,7 @@ import userRoutes from "./src/routes/userRoutes.js";
 import leaveRouter from "./src/routes/leaveRouter.js";
 import productRoutes from "./src/routes/Productroutes.js";
 import orderRoutes from "./src/routes/Orderroutes.js";
-import uploadRoute from "./src/routes/uploadRoute.js";
+import uploadRoute from "./src/routes/Uploadroute.js";
 import advertisementRoutes from "./src/routes/advertisementRoutes.js";
 
 
