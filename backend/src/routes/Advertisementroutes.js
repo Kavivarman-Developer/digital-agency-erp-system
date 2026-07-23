@@ -7,7 +7,7 @@ import {
   updateAdvertisement,
   deleteAdvertisement,
   trackClick,
-} from "../controllers/advertisementController.js";
+} from "../controllers/Advertisementcontroller.js";
 import { verifyToken } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
