@@ -6,44 +6,44 @@ import axios from "axios";
 
 const PAYMENT_METHODS = [
   { id: "PhonePe", label: "PhonePe", icon: "📱", sub: "UPI via PhonePe" },
-  { id: "UPI",     label: "UPI",     icon: "⚡", sub: "Any UPI app" },
-  { id: "Cash",    label: "Cash",    icon: "💵", sub: "Pay on delivery" },
+  { id: "UPI", label: "UPI", icon: "⚡", sub: "Any UPI app" },
+  { id: "Cash", label: "Cash", icon: "💵", sub: "Pay on delivery" },
 ];
 
 const CustomerCheckout = () => {
-  const cartItems  = useSelector(selectCartItems);
-  const dispatch   = useDispatch();
-  const navigate   = useNavigate();
+  const cartItems = useSelector(selectCartItems);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-  const [name,    setName]    = useState(localStorage.getItem("customerName") || "");
+  const [name, setName] = useState(localStorage.getItem("customerName") || "");
   const [address, setAddress] = useState("");
   const [pincode, setPincode] = useState("");
   const [payment, setPayment] = useState("PhonePe");
   const [loading, setLoading] = useState(false);
-  const [step,    setStep]    = useState(1); // 1 = address, 2 = payment
+  const [step, setStep] = useState(1); // 1 = address, 2 = payment
 
   const totalPrice = cartItems.reduce((acc, item) => acc + item.price * item.qty, 0);
   const totalItems = cartItems.reduce((acc, item) => acc + item.qty, 0);
-  const delivery   = totalPrice >= 499 ? 0 : 40;
+  const delivery = totalPrice >= 499 ? 0 : 40;
   const grandTotal = totalPrice + delivery;
 
   const handlePlaceOrder = async () => {
     if (!name || !address) { alert("Please fill in all fields!"); return; }
     setLoading(true);
     try {
-      await axios.post("http://localhost:5000/api/orders", {
-        customer:      name,
-        address:       `${address}${pincode ? " - " + pincode : ""}`,
+      await axios.post(`${import.meta.env.VITE_API_URL}/orders`, {
+        customer: name,
+        address: `${address}${pincode ? " - " + pincode : ""}`,
         payment,
-        total:         grandTotal,
+        total: grandTotal,
         paymentStatus: "unpaid",
-        status:        "pending",
+        status: "pending",
         items: cartItems.map((item) => ({
           productId: item.id,
-          name:      item.name,
-          price:     item.price,
-          qty:       item.qty,
-          image:     item.image || "",
+          name: item.name,
+          price: item.price,
+          qty: item.qty,
+          image: item.image || "",
         })),
       });
       localStorage.setItem("customerName", name);

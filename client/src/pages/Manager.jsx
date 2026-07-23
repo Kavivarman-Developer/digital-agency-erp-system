@@ -145,12 +145,12 @@ export default function Manager() {
   const tokenHeader = { headers: { Authorization: localStorage.getItem("token") } };
 
   const fetchClients = async () => {
-    const res = await axios.get("http://localhost:5000/api/clients", tokenHeader);
+    const res = await axios.get(`${import.meta.env.VITE_API_URL}/clients`, tokenHeader);
     setClients(res.data);
   };
 
   const fetchMyAssignedTasks = async () => {
-    const res = await axios.get("http://localhost:5000/api/tasks?assignedBy=my", tokenHeader);
+    const res = await axios.get(`${import.meta.env.VITE_API_URL}/tasks?assignedBy=my`, tokenHeader);
     setTasks(res.data);
   };
 

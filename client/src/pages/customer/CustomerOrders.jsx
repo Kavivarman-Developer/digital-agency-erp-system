@@ -115,7 +115,7 @@ const CustomerOrders = () => {
           return;
         }
         const res = await axios.get(
-          `http://localhost:5000/api/orders/my?name=${encodeURIComponent(name)}`
+          `${import.meta.env.VITE_API_URL}/orders/my?name=${encodeURIComponent(name)}`
         );
         setOrders(res.data);
       } catch (err) {

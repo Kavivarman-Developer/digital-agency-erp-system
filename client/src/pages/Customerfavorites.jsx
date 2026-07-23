@@ -3,7 +3,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { loadSettings } from "./Settings";
 
-const API = "http://localhost:5000";
+const API = import.meta.env.VITE_API_URL.replace("/api", "");
 
 // ── API helpers ───────────────────────────────────────────────────────────────
 const authHeader = () => ({

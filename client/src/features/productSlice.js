@@ -13,7 +13,7 @@ export const fetchProducts = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       // CustomerHome → public route (active products மட்டும்)
-      const res = await axios.get("http://localhost:5000/api/products");
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/products`);
       return res.data;
     } catch (err) {
       return rejectWithValue(err.response?.data?.error || "Failed to fetch products");
@@ -27,7 +27,7 @@ export const fetchAllProducts = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:5000/api/products/all", {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/products/all`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       return res.data;
@@ -43,7 +43,7 @@ export const createProductAPI = createAsyncThunk(
   async (productData, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.post("http://localhost:5000/api/products", productData, {
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/products`, productData, {
         headers: { Authorization: `Bearer ${token}` },
       });
       return res.data;
@@ -59,7 +59,7 @@ export const updateProductAPI = createAsyncThunk(
   async ({ id, ...data }, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.put(`http://localhost:5000/api/products/${id}`, data, {
+      const res = await axios.put(`${import.meta.env.VITE_API_URL}/products/${id}`, data, {
         headers: { Authorization: `Bearer ${token}` },
       });
       return res.data;
@@ -75,7 +75,7 @@ export const deleteProductAPI = createAsyncThunk(
   async (id, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:5000/api/products/${id}`, {
+      await axios.delete(`${import.meta.env.VITE_API_URL}/products/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       return id; // deleted id-ஐ திரும்ப அனுப்புகிறோம்

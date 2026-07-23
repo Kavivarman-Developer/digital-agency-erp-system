@@ -11,7 +11,7 @@ export default function Clients() {
   const [loading, setLoading] = useState(false);
 
   const fetchClients = async () => {
-    const res = await axios.get("http://localhost:5000/api/clients", {
+    const res = await axios.get(`${import.meta.env.VITE_API_URL}/clients`, {
       headers: { Authorization: localStorage.getItem("token") }
     });
     setClients(res.data);
@@ -26,11 +26,11 @@ export default function Clients() {
     setLoading(true);
     try {
       if (editId) {
-        await axios.put(`http://localhost:5000/api/clients/${editId}`, form, {
+        await axios.put(`${import.meta.env.VITE_API_URL}/clients/${editId}`, form, {
           headers: { Authorization: localStorage.getItem("token") }
         });
       } else {
-        await axios.post("http://localhost:5000/api/clients", form, {
+        await axios.post(`${import.meta.env.VITE_API_URL}/clients`, form, {
           headers: { Authorization: localStorage.getItem("token") }
         });
       }
@@ -48,7 +48,7 @@ export default function Clients() {
   };
 
   const handleDelete = async (id) => {
-    await axios.delete(`http://localhost:5000/api/clients/${id}`, {
+    await axios.delete(`${import.meta.env.VITE_API_URL}/clients/${id}`, {
       headers: { Authorization: localStorage.getItem("token") }
     });
     setDeleteId(null);

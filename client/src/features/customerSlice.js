@@ -1,7 +1,7 @@
 // features/customerSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
-const API = "http://localhost:5000";
+const API = import.meta.env.VITE_API_URL.replace("/api", "");
 const authHeader = () => ({
   "Content-Type": "application/json",
   Authorization: `Bearer ${localStorage.getItem("token")}`,

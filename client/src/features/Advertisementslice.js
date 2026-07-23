@@ -2,7 +2,7 @@
 import { createSlice, createAsyncThunk, createSelector } from "@reduxjs/toolkit";
 import axios from "axios";
 
-const BASE = "http://localhost:5000/api/advertisements";
+const BASE = `${import.meta.env.VITE_API_URL}/advertisements`;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Async Thunks

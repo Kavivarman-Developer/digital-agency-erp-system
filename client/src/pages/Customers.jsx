@@ -23,7 +23,7 @@ const Customers = () => {
     try {
       const token = localStorage.getItem("token");
       const res   = await fetch(
-        `http://localhost:5000/api/customers/${customer._id || customer.id}/favorites`,
+        `${import.meta.env.VITE_API_URL}/customers/${customer._id || customer.id}/favorites`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       const data = await res.json();

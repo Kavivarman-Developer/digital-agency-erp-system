@@ -62,7 +62,7 @@ const Advertisements = () => {
       const data  = new FormData();
       data.append("image", file);
       const token = localStorage.getItem("token");
-      const res   = await fetch("http://localhost:5000/api/upload", {
+      const res   = await fetch(`${import.meta.env.VITE_API_URL}/upload`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: data,

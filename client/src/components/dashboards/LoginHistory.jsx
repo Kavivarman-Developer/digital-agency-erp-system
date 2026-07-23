@@ -16,7 +16,7 @@ export default function LoginHistory() {
 
   const fetchLogs = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/history", {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/history`, {
         headers: { Authorization: localStorage.getItem("token") }
       });
       setLogs(res.data);

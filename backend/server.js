@@ -16,14 +16,40 @@ import orderRoutes from "./src/routes/Orderroutes.js";
 import uploadRoute from "./src/routes/Uploadroute.js";
 import advertisementRoutes from "./src/routes/Advertisementroutes.js";
 
-
 const port = process.env.PORT ?? 5000;
 connectDB();
 
 const app = express();
 
 app.use(express.json());
-app.use(cors());
+
+// ---------------- CORS CONFIG ----------------
+const allowedOrigins = [
+  "http://localhost:5173/",                          // local frontend dev
+  "https://digital-agency-erp-system.vercel.app",    // deployed frontend
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // allow requests with no origin (Postman, curl, server-to-server)
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      // allow all Vercel preview deployments for this project
+      if (/^https:\/\/digital-agency-erp-system.*\.vercel\.app$/.test(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error("Not allowed by CORS: " + origin));
+    },
+    credentials: true,
+  })
+);
+// -----------------------------------------------
 
 // Existing routes
 app.use("/api/auth", authRoutes);
@@ -43,7 +69,6 @@ app.use("/api/upload", uploadRoute);
 
 // Advertisement routes (both public and admin)
 app.use("/api/advertisements", advertisementRoutes);
-
 
 app.get("/test-whatsapp", async (req, res) => {
   await sendWhatsAppMessage(

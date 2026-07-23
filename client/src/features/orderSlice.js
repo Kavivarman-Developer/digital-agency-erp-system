@@ -12,7 +12,7 @@ export const fetchOrders = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:5000/api/orders", {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/orders`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       return res.data;
@@ -28,7 +28,7 @@ export const updateOrderAPI = createAsyncThunk(
   async ({ id, ...updateData }, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.patch(`http://localhost:5000/api/orders/${id}`, updateData, {
+      const res = await axios.patch(`${import.meta.env.VITE_API_URL}/orders/${id}`, updateData, {
         headers: { Authorization: `Bearer ${token}` },
       });
       return res.data;

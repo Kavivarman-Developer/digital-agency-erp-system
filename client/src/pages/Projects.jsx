@@ -16,12 +16,12 @@ export default function Projects() {
   const tokenHeader = { headers: { Authorization: localStorage.getItem("token") } };
 
   const fetchProjects = async () => {
-    const res = await axios.get("http://localhost:5000/api/projects", tokenHeader);
+    const res = await axios.get(`${import.meta.env.VITE_API_URL}/projects`, tokenHeader);
     setProjects(res.data);
   };
 
   const fetchClients = async () => {
-    const res = await axios.get("http://localhost:5000/api/clients", tokenHeader);
+    const res = await axios.get(`${import.meta.env.VITE_API_URL}/clients`, tokenHeader);
     setClients(res.data);
   };
 
@@ -35,9 +35,9 @@ export default function Projects() {
     try {
       const data = { ...form, teamMembers: form.teamMembers.split(",").map(s => s.trim()).filter(Boolean) };
       if (editId) {
-        await axios.put(`http://localhost:5000/api/projects/${editId}`, data, tokenHeader);
+        await axios.put(`${import.meta.env.VITE_API_URL}/projects/${editId}`, data, tokenHeader);
       } else {
-        await axios.post("http://localhost:5000/api/projects", data, tokenHeader);
+        await axios.post(`${import.meta.env.VITE_API_URL}/projects`, data, tokenHeader);
       }
       setForm({ name: "", clientId: "", teamMembers: "", deadline: "", progress: 0, status: "pending" });
       setEditId(null);
@@ -53,7 +53,7 @@ export default function Projects() {
   };
 
   const handleDelete = async (id) => {
-    await axios.delete(`http://localhost:5000/api/projects/${id}`, tokenHeader);
+    await axios.delete(`${import.meta.env.VITE_API_URL}/projects/${id}`, tokenHeader);
     setDeleteId(null);
     fetchProjects();
   };

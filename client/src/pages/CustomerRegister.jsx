@@ -21,7 +21,7 @@ export default function CustomerRegister() {
     setLoading(true);
     try {
       // role: "customer" — fixed, user மாத்த முடியாது
-      await axios.post("http://localhost:5000/api/auth/register", {
+      await axios.post(`${import.meta.env.VITE_API_URL}/auth/register`, {
         name,
         email,
         password,

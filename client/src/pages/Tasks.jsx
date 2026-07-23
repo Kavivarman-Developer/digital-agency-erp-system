@@ -19,15 +19,15 @@ export default function Tasks() {
   const tokenHeader = { headers: { Authorization: localStorage.getItem("token") } };
 
   const fetchTasks = async () => {
-    const res = await axios.get("http://localhost:5000/api/tasks", tokenHeader);
+    const res = await axios.get(`${import.meta.env.VITE_API_URL}/tasks`, tokenHeader);
     setTasks(res.data);
   };
   const fetchProjects = async () => {
-    const res = await axios.get("http://localhost:5000/api/projects", tokenHeader);
+    const res = await axios.get(`${import.meta.env.VITE_API_URL}/projects`, tokenHeader);
     setProjects(res.data);
   };
   const fetchUsers = async () => {
-    const res = await axios.get("http://localhost:5000/api/users", tokenHeader);
+    const res = await axios.get(`${import.meta.env.VITE_API_URL}/users`, tokenHeader);
     setUsers(res.data);
   };
 
@@ -41,9 +41,9 @@ export default function Tasks() {
     try {
       const data = { ...form, assignedTo: [form.assignedTo] };
       if (editId) {
-        await axios.put(`http://localhost:5000/api/tasks/${editId}`, data, tokenHeader);
+        await axios.put(`${import.meta.env.VITE_API_URL}/tasks/${editId}`, data, tokenHeader);
       } else {
-        await axios.post("http://localhost:5000/api/tasks", data, tokenHeader);
+        await axios.post(`${import.meta.env.VITE_API_URL}/tasks`, data, tokenHeader);
       }
       setForm({ title: "", projectId: "", assignedTo: "", deadline: "", progress: 0, status: "todo" });
       setEditId(null);
@@ -66,7 +66,7 @@ export default function Tasks() {
   };
 
   const handleDelete = async (id) => {
-    await axios.delete(`http://localhost:5000/api/tasks/${id}`, tokenHeader);
+    await axios.delete(`${import.meta.env.VITE_API_URL}/tasks/${id}`, tokenHeader);
     setDeleteId(null);
     fetchTasks();
   };
@@ -80,7 +80,7 @@ export default function Tasks() {
   const addComment = async (taskId) => {
     const text = commentMap[taskId];
     if (!text?.trim()) return;
-    await axios.post(`http://localhost:5000/api/tasks/${taskId}/comment`, { text }, tokenHeader);
+    await axios.post(`${import.meta.env.VITE_API_URL}/tasks/${taskId}/comment`, { text }, tokenHeader);
     setCommentMap({ ...commentMap, [taskId]: "" });
     fetchTasks();
   };
