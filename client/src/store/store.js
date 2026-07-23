@@ -6,7 +6,7 @@ import orderReducer from "../features/orderSlice";
 import productReducer from "../features/productSlice"; 
 import customerReducer from "../features/customerSlice";
 import templateReducer from "../features/templateSlice";
-import advertisementReducer from "../features/advertisementSlice";
+import advertisementReducer from "../features/Advertisementslice";
 
 export const store = configureStore({
   reducer: {
