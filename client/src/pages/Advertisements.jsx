@@ -8,7 +8,7 @@ import {
   createAdAPI,
   updateAdAPI,
   deleteAdAPI,
-} from "../features/advertisementSlice";
+} from "../features/Advertisementslice";
 import Layout from "../components/layout/Layout";
 
 const POSITIONS = ["hero", "top-banner", "mid-banner", "popup"];

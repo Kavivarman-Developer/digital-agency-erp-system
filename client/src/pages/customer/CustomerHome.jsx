@@ -11,7 +11,7 @@ import {
 import {
   fetchActiveAds, trackAdClick,
   selectHeroAds, selectTopBannerAds, selectMidBannerAds, selectAdsLoading,
-} from "../../features/advertisementSlice";
+} from "../../features/Advertisementslice";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Wishlist helpers — localStorage + login-ஆனா sync
