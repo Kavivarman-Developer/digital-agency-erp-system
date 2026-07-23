@@ -14,7 +14,7 @@ import leaveRouter from "./src/routes/leaveRouter.js";
 import productRoutes from "./src/routes/Productroutes.js";
 import orderRoutes from "./src/routes/Orderroutes.js";
 import uploadRoute from "./src/routes/Uploadroute.js";
-import advertisementRoutes from "./src/routes/advertisementRoutes.js";
+import advertisementRoutes from "./src/routes/Advertisementroutes.js";
 
 
 const port = process.env.PORT ?? 5000;
