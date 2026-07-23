@@ -1,7 +1,7 @@
-const jwt = require("jsonwebtoken");
+import jwt from "jsonwebtoken";
 
 // ✅ CORRECTED: Verify Token - Extract token from "Bearer <token>" format
-exports.verifyToken = (req, res, next) => {
+export const verifyToken = (req, res, next) => {
   const authHeader = req.headers.authorization;
 
   // ✅ CORRECTED: Check if authorization header exists
@@ -31,7 +31,7 @@ exports.verifyToken = (req, res, next) => {
 };
 
 // ✅ Role-Based Access Control
-exports.authorizeRoles = (...roles) => {
+export const authorizeRoles = (...roles) => {
   return (req, res, next) => {
     // ✅ CORRECTED: Check if user role is in allowed roles
     if (!req.user || !roles.includes(req.user.role)) {

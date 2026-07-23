@@ -1,5 +1,5 @@
-const leaves = require('../models/leaveModel');
-const sendWhatsAppMessage = require("../services/whatsappService");
+import leaves from "../models/leaveModel.js";
+import sendWhatsAppMessage from "../services/whatsappService.js";
 
 
 const applyLeave = async (req, res) => {
@@ -235,10 +235,4 @@ const approveLeave = async (req, res) => {
     }
 };
 
-module.exports = {
-    applyLeave,
-    getMyLeaves,
-    getAllLeaves,
-    upadateLeaveStatus,
-    approveLeave
-};
+export { applyLeave, getMyLeaves, getAllLeaves, upadateLeaveStatus, approveLeave };

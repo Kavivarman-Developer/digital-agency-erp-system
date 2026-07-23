@@ -1,6 +1,7 @@
-const router = require("express").Router();
-const LoginHistory = require("../models/LoginHistory");
-const { verifyToken } = require("../middleware/authMiddleware");
+import express from "express";
+const router = express.Router();
+import LoginHistory from "../models/LoginHistory.js";
+import { verifyToken } from "../middleware/authMiddleware.js";
 
 // 👑 Admin → see all logs
 router.get("/", verifyToken, async (req, res) => {
@@ -18,4 +19,4 @@ router.get("/my", verifyToken, async (req, res) => {
   res.json(logs);
 });
 
-module.exports = router;
+export default router;

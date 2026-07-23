@@ -1,31 +1,27 @@
-const User = require("../models/User");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-const LoginHistory = require("../models/LoginHistory");
+import User from "../models/User.js";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import LoginHistory from "../models/LoginHistory.js";
 
 // REGISTER
-exports.register = async (req, res) => {
+export const register = async (req, res) => {
     try {
         const { name, email, password, phone, role } = req.body;
 
-        // ✅ VALIDATION: phone is required for WhatsApp notifications
         if (!name || !email || !password || !phone) {
             return res.status(400).json("Name, email, password and phone are required");
         }
 
-        // check existing user
         const exists = await User.findOne({ email });
         if (exists) return res.status(400).json("User already exists");
 
-        // hash password
         const hashed = await bcrypt.hash(password, 10);
 
-        // create user with phone field included
         const user = await User.create({
             name,
             email,
             password: hashed,
-            phone, // ✅ SAVE: Store user phone for WhatsApp
+            phone,
             role
         });
 
@@ -37,33 +33,35 @@ exports.register = async (req, res) => {
 };
 
 // LOGIN
-exports.login = async (req, res) => {
+export const login = async (req, res) => {
     try {
         const { email, password } = req.body;
 
         const user = await User.findOne({ email });
-        if (!user) return res.status(400).json("User not found");
+        if (!user) return res.status(400).json({ error: "User not found" });
 
         const match = await bcrypt.compare(password, user.password);
-        if (!match) return res.status(400).json("Wrong password");
+        if (!match) return res.status(400).json({ error: "Wrong password" });
 
         const token = jwt.sign(
             { id: user._id, role: user.role },
             process.env.JWT_SECRET,
             { expiresIn: "1h" }
         );
-        await LoginHistory.create({
-            userId: user._id,
-            email: user.email,
-            role: user.role
-        });
 
-        res.json({
-            token,
-            role: user.role
-        });
+        // Customer-க்கு login history skip பண்ணலாம் — CRM-ல் காட்ட வேண்டாம்
+        if (user.role !== "customer") {
+            await LoginHistory.create({
+                userId: user._id,
+                email: user.email,
+                role: user.role
+            });
+        }
+
+        // name add பண்ணினோம் — CustomerLogin.jsx-ல் customerName-க்கு use ஆகும்
+        res.json({ token, role: user.role, name: user.name });
 
     } catch (err) {
-        res.status(500).json(err.message);
+        res.status(500).json({ error: err.message });
     }
 };

@@ -1,16 +1,10 @@
-const router = require("express").Router();
+import express from "express";
+const router = express.Router();
 
-const {
-  createTask,
-  getTasks,
-  updateTask,
-  deleteTask,
-  addComment,
-  completeTask
-} = require("../controllers/taskController");
+import { createTask, getTasks, updateTask, deleteTask, addComment, completeTask } from "../controllers/taskController.js";
 
-const { verifyToken, authorizeRoles } = require("../middleware/authMiddleware");
-const Task = require("../models/Task");
+import { verifyToken, authorizeRoles } from "../middleware/authMiddleware.js";
+import Task from "../models/Task.js";
 
 router.post("/", verifyToken, authorizeRoles("admin", "manager"), createTask);
 router.get("/", verifyToken, getTasks);
@@ -42,4 +36,4 @@ router.get("/my", verifyToken, async (req, res) => {
 // ✅ Mark complete
 router.post("/:id/complete", verifyToken, completeTask);
 
-module.exports = router;
+export default router;

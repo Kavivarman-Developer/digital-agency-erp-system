@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const loginHistorySchema = new mongoose.Schema({
   userId: {
@@ -13,4 +13,4 @@ const loginHistorySchema = new mongoose.Schema({
   }
 });
 
-module.exports = mongoose.model("LoginHistory", loginHistorySchema);
+export default mongoose.model("LoginHistory", loginHistorySchema);

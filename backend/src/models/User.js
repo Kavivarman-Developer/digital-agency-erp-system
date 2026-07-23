@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -16,13 +16,13 @@ const userSchema = new mongoose.Schema({
   },
   phone: {
     type: String,
-    required: true // ✅ change this
+    required: true
   },
   role: {
     type: String,
-    enum: ["admin", "manager", "user"],
+    enum: ["admin", "manager", "user", "customer"],
     default: "user"
   }
 }, { timestamps: true });
 
-module.exports = mongoose.model("User", userSchema);
+export default mongoose.model("User", userSchema);

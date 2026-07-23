@@ -1,8 +1,8 @@
-const Task = require("../models/Task");
+import Task from "../models/Task.js";
 
 
 // ➕ Create
-exports.createTask = async (req, res) => {
+export const createTask = async (req, res) => {
   // ensure assignedBy is recorded
   const payload = { ...req.body, assignedBy: req.user.id };
   const task = await Task.create(payload);
@@ -10,7 +10,7 @@ exports.createTask = async (req, res) => {
 };
 
 // 📄 Get All
-exports.getTasks = async (req, res) => {
+export const getTasks = async (req, res) => {
   // allow manager to filter tasks they assigned with ?assignedBy=my
   const filter = {};
 
@@ -28,7 +28,7 @@ exports.getTasks = async (req, res) => {
 };
 
 // ✏️ Update
-exports.updateTask = async (req, res) => {
+export const updateTask = async (req, res) => {
   const task = await Task.findByIdAndUpdate(
     req.params.id,
     req.body,
@@ -38,7 +38,7 @@ exports.updateTask = async (req, res) => {
 };
 
 // Mark task as completed by the current user
-exports.completeTask = async (req, res) => {
+export const completeTask = async (req, res) => {
   const task = await Task.findById(req.params.id);
   if (!task) return res.status(404).json("Task not found");
 
@@ -67,13 +67,13 @@ exports.completeTask = async (req, res) => {
 };
 
 // ❌ Delete
-exports.deleteTask = async (req, res) => {
+export const deleteTask = async (req, res) => {
   await Task.findByIdAndDelete(req.params.id);
   res.json("Deleted");
 };
 
 // 💬 Add Comment
-exports.addComment = async (req, res) => {
+export const addComment = async (req, res) => {
   const task = await Task.findById(req.params.id);
 
   task.comments.push({ text: req.body.text });

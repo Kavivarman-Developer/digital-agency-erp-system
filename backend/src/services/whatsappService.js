@@ -1,4 +1,4 @@
-const twilio = require("twilio");
+import twilio from "twilio";
 
 const client = twilio(
   process.env.TWILIO_SID,
@@ -19,4 +19,4 @@ const sendWhatsAppMessage = async (to, message) => {
   }
 };
 
-module.exports = sendWhatsAppMessage;
+export default sendWhatsAppMessage;

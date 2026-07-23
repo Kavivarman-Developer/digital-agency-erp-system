@@ -1,5 +1,6 @@
-const router = require("express").Router();
-const { verifyToken, authorizeRoles } = require("../middleware/authMiddleware");
+import express from "express";
+const router = express.Router();
+import { verifyToken, authorizeRoles } from "../middleware/authMiddleware.js";
 
 // 👑 Admin only
 router.get("/admin", verifyToken, authorizeRoles("admin"), (req, res) => {
@@ -16,4 +17,4 @@ router.get("/user", verifyToken, authorizeRoles("admin", "manager", "user"), (re
   res.json("Welcome User");
 });
 
-module.exports = router;
+export default router;

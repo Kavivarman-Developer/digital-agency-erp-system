@@ -1,7 +1,7 @@
-const Client = require("../models/Client");
+import Client from "../models/Client.js";
 
 // ➕ Create Client
-exports.createClient = async (req, res) => {
+export const createClient = async (req, res) => {
   try {
     const client = await Client.create(req.body);
     res.json(client);
@@ -11,13 +11,13 @@ exports.createClient = async (req, res) => {
 };
 
 // 📄 Get All Clients
-exports.getClients = async (req, res) => {
+export const getClients = async (req, res) => {
   const clients = await Client.find();
   res.json(clients);
 };
 
 // ✏️ Update Client
-exports.updateClient = async (req, res) => {
+export const updateClient = async (req, res) => {
   const client = await Client.findByIdAndUpdate(
     req.params.id,
     req.body,
@@ -27,7 +27,7 @@ exports.updateClient = async (req, res) => {
 };
 
 // ❌ Delete Client
-exports.deleteClient = async (req, res) => {
+export const deleteClient = async (req, res) => {
   await Client.findByIdAndDelete(req.params.id);
   res.json("Client deleted");
 };
