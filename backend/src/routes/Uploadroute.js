@@ -1,6 +1,6 @@
-// routes/uploadRoute.js
+// routes/Uploadroute.js
 import express from "express";
-import { upload, uploadImage } from "../controllers/uploadcontroller.js";
+import { upload, uploadImage } from "../controllers/Uploadcontroller.js";
 import { verifyToken } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
