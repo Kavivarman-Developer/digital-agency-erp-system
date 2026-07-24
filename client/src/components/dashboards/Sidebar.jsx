@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { motion, AnimatePresence } from "framer-motion";
@@ -6,7 +6,7 @@ import {
   Users, FolderOpen, Package, ShoppingCart, FileCode2,
   Search, Bell, Settings, LogOut, Zap, ChevronRight,
   Sun, Moon, Menu, X, LayoutDashboard, Briefcase, ShieldAlert,
-  Megaphone, // ✅ Advertisement icon
+  Megaphone, TrendingUp, // ✅ TrendingUp - Customer Insights icon
 } from "lucide-react";
 import { logout } from "../../utils/auth";
 import { selectAllOrders, fetchOrders } from "../../features/orderSlice";
@@ -22,6 +22,7 @@ const buildMenu = (newOrderCount) => [
       { label: "Dashboard", path: "/admin", icon: LayoutDashboard },
       { label: "Clients",   path: "/clients",   icon: Users },
       { label: "Customers", path: "/customers", icon: Users },
+      { label: "Customer Insights", path: "/admin/customer-insights", icon: TrendingUp }, // 🆕 NEW
     ],
   },
   {
@@ -38,7 +39,7 @@ const buildMenu = (newOrderCount) => [
       { label: "Products",       path: "/products",       icon: Package },
       { label: "Orders",         path: "/orders",         icon: ShoppingCart, badge: newOrderCount || null },
       { label: "Templates",      path: "/templates",      icon: FileCode2 },
-      { label: "Advertisements", path: "/advertisements", icon: Megaphone }, // NEW
+      { label: "Advertisements", path: "/advertisements", icon: Megaphone },
     ],
   },
   {
@@ -50,14 +51,14 @@ const buildMenu = (newOrderCount) => [
       { label: "Tasks",  path: "/tasks",  icon: FolderOpen },
     ],
   },
-  { 
-  section: "System", 
-  icon: ShieldAlert, 
-  badge: null, 
-  items: [
-    { label: "Settings", path: "/settings", icon: Settings },
-  ] 
-},
+  {
+    section: "System",
+    icon: ShieldAlert,
+    badge: null,
+    items: [
+      { label: "Settings", path: "/settings", icon: Settings },
+    ]
+  },
 ];
 
 /* ─── Theme helpers ──────────────────────────────────────────── */
@@ -102,6 +103,12 @@ export default function Sidebar() {
 
   const orders = useSelector(selectAllOrders);
 
+  // 🔧 BUG 2 FIX: Redux auth state-la irundhu role/email edukkanum, localStorage direct-a illa
+  const authState = useSelector((state) => state.auth);
+  const role = authState?.role || localStorage.getItem("role") || "admin";
+  const email = authState?.email || localStorage.getItem("email") || "";
+  const userName = email ? email.split("@")[0] : "user";
+
   const [lastSeenAt, setLastSeenAt] = useState(
     () => Number(localStorage.getItem("ordersLastSeen") || 0)
   );
@@ -114,30 +121,40 @@ export default function Sidebar() {
     }
   }, [location.pathname]);
 
-  const newOrderCount = orders.filter((o) => {
-    const createdTime = new Date(o.createdAt).getTime();
-    return createdTime > lastSeenAt;
-  }).length;
+  // 🔧 BUG 3 FIX: useMemo vechi unnecessary recalculation avoid pannuthu
+  const newOrderCount = useMemo(() => {
+    return orders.filter((o) => {
+      const createdTime = new Date(o.createdAt).getTime();
+      return createdTime > lastSeenAt;
+    }).length;
+  }, [orders, lastSeenAt]);
 
   useEffect(() => {
     dispatch(fetchOrders());
   }, [dispatch]);
 
-  const ADMIN_MENU = buildMenu(newOrderCount);
+  const ADMIN_MENU = useMemo(() => buildMenu(newOrderCount), [newOrderCount]);
 
-  const [search,      setSearch]      = useState("");
-  const [theme,       setTheme]       = useState(
+  const [search, setSearch] = useState("");
+  const [theme, setTheme] = useState(
     () => localStorage.getItem("theme") ||
       (document.documentElement.classList.contains("dark") ? "dark" : "light")
   );
   const [isCollapsed, setIsCollapsed] = useState(
     () => localStorage.getItem("sidebarCollapsed") === "true"
   );
-  const [openSection, setOpenSection] = useState("Store & Sales");
 
-  const role     = localStorage.getItem("role")  || "admin";
-  const email    = localStorage.getItem("email") || "kavin@gmail.com";
-  const userName = email.split("@")[0];
+  // 🔧 BUG 1 FIX: current route padi correct section active-a irukanum
+  const getSectionForPath = (path) =>
+    ADMIN_MENU.find((sec) => sec.items.some((i) => i.path === path))?.section || "CRM";
+
+  const [openSection, setOpenSection] = useState(() => getSectionForPath(location.pathname));
+
+  // Route maarumbodhu (navigation or refresh), correct section auto-open aaganum
+  useEffect(() => {
+    setOpenSection(getSectionForPath(location.pathname));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.pathname]);
 
   useEffect(() => {
     try { localStorage.setItem("theme", theme); } catch (_) {}

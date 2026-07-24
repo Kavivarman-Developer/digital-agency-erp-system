@@ -15,6 +15,8 @@ import productRoutes from "./src/routes/Productroutes.js";
 import orderRoutes from "./src/routes/Orderroutes.js";
 import uploadRoute from "./src/routes/Uploadroute.js";
 import advertisementRoutes from "./src/routes/Advertisementroutes.js";
+import searchActivityRoutes from "./src/routes/searchActivityRoutes.js";
+import customerRoutes from "./src/routes/Customerroutes.js";
 
 const port = process.env.PORT ?? 5000;
 connectDB();
@@ -25,7 +27,9 @@ app.use(express.json());
 
 // ---------------- CORS CONFIG ----------------
 const allowedOrigins = [
-  "http://localhost:5173/",                          // local frontend dev
+  "http://localhost:5173",   
+  "http://localhost:5174",
+  "http://localhost:3000",   // local frontend dev
   "https://digital-agency-erp-system.vercel.app",    // deployed frontend
 ];
 
@@ -59,6 +63,7 @@ app.use("/api/clients", clientRoutes);
 app.use("/api/projects", projectRoutes);
 app.use("/api/tasks", taskRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/customers", customerRoutes);
 app.use("/api/leaves", leaveRouter);
 app.use("/api/leave", leaveRouter);
 
@@ -69,6 +74,9 @@ app.use("/api/upload", uploadRoute);
 
 // Advertisement routes (both public and admin)
 app.use("/api/advertisements", advertisementRoutes);
+
+// search activity routes
+app.use("/api/activity", searchActivityRoutes);
 
 app.get("/test-whatsapp", async (req, res) => {
   await sendWhatsAppMessage(

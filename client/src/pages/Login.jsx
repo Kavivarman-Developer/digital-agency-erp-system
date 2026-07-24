@@ -1,73 +1,55 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { loginUser, logout } from "../features/authSlice";
 import { showToast } from "../utils/toast";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
 
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { token, role, loading, error } = useSelector((state) => state.auth);
 
-  // useEffect(() => {
-  //   const token = localStorage.getItem("token");
-  //   const role = localStorage.getItem("role");
-  //   if (!token) return;
-  //   if (role === "admin") navigate("/admin", { replace: true });
-  //   else if (role === "manager") navigate("/manager", { replace: true });
-  //   else navigate("/user", { replace: true });
-  // }, []);
+  // Already logged-in a, redirect pannunga
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    const role = localStorage.getItem("role");
-
     if (!token || !role) return;
-
-    switch (role) {
-      case "admin":
-        navigate("/admin", { replace: true });
-        break;
-
-      case "manager":
-        navigate("/manager", { replace: true });
-        break;
-
-      case "customer":
-        navigate("/shop", { replace: true });
-        break;
-
-      case "user":
-        navigate("/user", { replace: true });
-        break;
-
-      default:
-        break;
+    if (role === "customer") {
+      dispatch(logout());
+      return;
     }
-  }, [navigate]);
+    redirectByRole(role);
+  }, [token, role, dispatch]);
+
+  // Login error vandha toast kaamikanum
+  useEffect(() => {
+    if (error) showToast(error, "error");
+  }, [error]);
+
+  const redirectByRole = (role) => {
+    if (role === "admin") navigate("/admin", { replace: true });
+    else if (role === "manager") navigate("/manager", { replace: true });
+    else if (role === "customer") {
+      dispatch(logout());
+    }
+    else navigate("/user", { replace: true });
+  };
 
   const login = async () => {
     if (!email || !password) {
       showToast("All fields required", "error");
       return;
     }
-    setLoading(true);
-    try {
-      const res = await axios.post(`${import.meta.env.VITE_API_URL}/auth/login`, { email, password });
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("role", res.data.role);
-      localStorage.setItem("email", email);
+
+    const result = await dispatch(loginUser({ email, password }));
+
+    if (loginUser.fulfilled.match(result)) {
       showToast("Login successful");
-      if (res.data.role === "admin") navigate("/admin");
-      else if (res.data.role === "manager") navigate("/manager");
-      else if (res.data.role === "customer") navigate("/shop");
-      else navigate("/user");
-    } catch (err) {
-      showToast(err.response?.data || "Login failed", "error");
-    } finally {
-      setLoading(false);
+      redirectByRole(result.payload.role);
     }
+    // rejected aana, useEffect la error already handle aagum
   };
 
   const handleKeyDown = (e) => {
@@ -76,16 +58,12 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex bg-slate-50">
-
-      {/* LEFT PANEL */}
+      {/* LEFT PANEL - unga existing code same-a irukum, change onnum illa */}
       <div className="hidden lg:flex w-1/2 bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 p-14 flex-col justify-between relative overflow-hidden">
-
-        {/* Background decoration circles */}
         <div className="absolute -top-20 -left-20 w-80 h-80 bg-white/5 rounded-full" />
         <div className="absolute top-1/3 -right-16 w-64 h-64 bg-white/5 rounded-full" />
         <div className="absolute -bottom-10 left-1/4 w-48 h-48 bg-white/5 rounded-full" />
 
-        {/* Logo / Brand */}
         <div className="relative z-10">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center text-lg">⚡</div>
@@ -93,7 +71,6 @@ export default function Login() {
           </div>
         </div>
 
-        {/* Main copy */}
         <div className="relative z-10">
           <h1 className="text-4xl font-bold text-white leading-tight mb-4">
             Manage your team,<br />
@@ -121,30 +98,23 @@ export default function Login() {
           </div>
         </div>
 
-        {/* Footer note */}
         <p className="relative z-10 text-blue-300 text-xs">Built for real-world application & assessment.</p>
       </div>
 
       {/* RIGHT PANEL */}
       <div className="flex-1 flex items-center justify-center p-6">
         <div className="w-full max-w-sm">
-
-          {/* Mobile brand */}
           <div className="flex items-center gap-2.5 mb-8 lg:hidden">
             <div className="w-8 h-8 bg-blue-600 rounded-xl flex items-center justify-center text-white text-sm">⚡</div>
             <span className="text-slate-800 font-bold text-base">WorkSphere</span>
           </div>
 
-          {/* Heading */}
           <div className="mb-8">
             <h2 className="text-2xl font-bold text-slate-800 mb-1">Welcome back</h2>
             <p className="text-sm text-slate-400">Sign in to your account to continue</p>
           </div>
 
-          {/* Form card */}
           <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-8">
-
-            {/* Email */}
             <div className="mb-4">
               <label className="block text-xs font-medium text-slate-500 mb-1.5">Email Address</label>
               <input
@@ -157,7 +127,6 @@ export default function Login() {
               />
             </div>
 
-            {/* Password */}
             <div className="mb-6">
               <label className="block text-xs font-medium text-slate-500 mb-1.5">Password</label>
               <div className="relative">
@@ -179,7 +148,6 @@ export default function Login() {
               </div>
             </div>
 
-            {/* Submit */}
             <button
               onClick={login}
               disabled={loading}
@@ -195,23 +163,16 @@ export default function Login() {
                 </span>
               ) : "Sign In"}
             </button>
-
           </div>
 
-          {/* Register link */}
           <p className="mt-5 text-center text-sm text-slate-400">
             Don't have an account?{" "}
-            <span
-              onClick={() => navigate("/register")}
-              className="text-blue-600 cursor-pointer font-medium hover:underline"
-            >
+            <span onClick={() => navigate("/register")} className="text-blue-600 cursor-pointer font-medium hover:underline">
               Create one
             </span>
           </p>
-
         </div>
       </div>
-
     </div>
   );
 }

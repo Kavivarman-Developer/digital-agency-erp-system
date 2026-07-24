@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import axios from "axios";
 import Layout from "../components/layout/Layout";
 import LoginHistory from "../components/dashboards/LoginHistory";
@@ -56,8 +55,8 @@ export default function Admin() {
         </div>
 
         {/* ── Customer Portal Link ── */}
-        <Link
-          to="/shop"
+        <a
+          href={import.meta.env.VITE_SHOP_URL || "http://localhost:5174"}
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition shadow-sm shadow-indigo-200"
@@ -65,7 +64,7 @@ export default function Admin() {
           <span className="text-base">🛍️</span>
           Customer Portal
           <span className="text-indigo-300 text-xs">↗</span>
-        </Link>
+        </a>
       </div>
 
       {/* STAT CARDS */}
