@@ -22,6 +22,20 @@ const userSchema = new mongoose.Schema({
     type: String,
     enum: ["admin", "manager", "user", "customer"],
     default: "user"
+  },
+  favorites: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Product",
+    },
+  ],
+  orders: {
+    type: Number,
+    default: 0
+  },
+  totalSpent: {
+    type: Number,
+    default: 0
   }
 }, { timestamps: true });
 

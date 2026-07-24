@@ -1,13 +1,15 @@
 // controllers/customerController.js
-import Customer from "../models/Customer.js";
+import User from "../models/User.js";
 import Product from "../models/Product.js";
+
+const customerQuery = (id) => User.findOne({ _id: id, role: "customer" });
 
 // ─────────────────────────────────────────────────────────────────────────────
 // GET /api/customers — CRM: all customers list
 // ─────────────────────────────────────────────────────────────────────────────
 export const getAllCustomers = async (req, res) => {
   try {
-    const customers = await Customer.find()
+    const customers = await User.find({ role: "customer" })
       .select("-password")
       .populate("favorites", "name price mrp image category offerLabel stock")
       .sort({ createdAt: -1 })
@@ -23,7 +25,7 @@ export const getAllCustomers = async (req, res) => {
 // ─────────────────────────────────────────────────────────────────────────────
 export const getCustomerById = async (req, res) => {
   try {
-    const customer = await Customer.findById(req.params.id)
+    const customer = await customerQuery(req.params.id)
       .select("-password")
       .populate("favorites", "name price mrp image category offerLabel stock status");
     if (!customer) return res.status(404).json({ error: "Customer not found" });
@@ -39,7 +41,7 @@ export const getCustomerById = async (req, res) => {
 // ─────────────────────────────────────────────────────────────────────────────
 export const getMyFavorites = async (req, res) => {
   try {
-    const customer = await Customer.findById(req.user.id)
+    const customer = await customerQuery(req.user.id)
       .populate("favorites", "name price mrp image category offerLabel stock status");
     if (!customer) return res.status(404).json({ error: "Customer not found" });
     res.json(customer.favorites || []);
@@ -54,7 +56,7 @@ export const getMyFavorites = async (req, res) => {
 // ─────────────────────────────────────────────────────────────────────────────
 export const toggleFavorite = async (req, res) => {
   try {
-    const customer = await Customer.findById(req.user.id);
+    const customer = await customerQuery(req.user.id);
     if (!customer) return res.status(404).json({ error: "Customer not found" });
 
     const productId = req.params.productId;
@@ -80,7 +82,7 @@ export const toggleFavorite = async (req, res) => {
     await customer.save();
 
     // Return populated favorites
-    const updated = await Customer.findById(req.user.id)
+    const updated = await customerQuery(req.user.id)
       .populate("favorites", "name price mrp image category offerLabel stock status");
 
     res.json({
@@ -97,7 +99,7 @@ export const toggleFavorite = async (req, res) => {
 // ─────────────────────────────────────────────────────────────────────────────
 export const clearFavorites = async (req, res) => {
   try {
-    const customer = await Customer.findById(req.user.id);
+    const customer = await customerQuery(req.user.id);
     if (!customer) return res.status(404).json({ error: "Customer not found" });
     customer.favorites = [];
     await customer.save();
@@ -112,7 +114,7 @@ export const clearFavorites = async (req, res) => {
 // ─────────────────────────────────────────────────────────────────────────────
 export const getCustomerFavoritesByAdmin = async (req, res) => {
   try {
-    const customer = await Customer.findById(req.params.id)
+    const customer = await customerQuery(req.params.id)
       .select("name email favorites")
       .populate("favorites", "name price mrp image category offerLabel stock status");
     if (!customer) return res.status(404).json({ error: "Customer not found" });

@@ -12,6 +12,7 @@ import {
   fetchActiveAds, trackAdClick,
   selectHeroAds, selectTopBannerAds, selectMidBannerAds, selectAdsLoading,
 } from "../../features/Advertisementslice";
+import API from "../../api/axios";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Wishlist helpers — localStorage + login-ஆனா sync
@@ -198,10 +199,29 @@ const CustomerHome = () => {
   const isLoggedIn = !!(localStorage.getItem("token") && localStorage.getItem("role") === "customer");
   const cartCount  = cartItems.reduce((acc, i) => acc + i.qty, 0);
 
+  const logCustomerActivity = useCallback((payload) => {
+    if (!isLoggedIn) return;
+    API.post("/activity/log", payload).catch(() => {});
+  }, [isLoggedIn]);
+
   useEffect(() => {
     dispatch(fetchProducts());
     dispatch(fetchActiveAds());
   }, [dispatch]);
+
+  useEffect(() => {
+    if (!isLoggedIn || (!search.trim() && category === "All")) return;
+
+    const timer = setTimeout(() => {
+      logCustomerActivity({
+        actionType: "search",
+        searchTerm: search.trim(),
+        category: category === "All" ? undefined : category,
+      });
+    }, 700);
+
+    return () => clearTimeout(timer);
+  }, [category, isLoggedIn, logCustomerActivity, search]);
 
   // ── CTA click ──────────────────────────────────────────────────────────────
   const handleCtaClick = useCallback((ad) => {
@@ -215,6 +235,11 @@ const CustomerHome = () => {
   // ── Add to Cart — login இல்லன்னா modal காட்டு ──────────────────────────
   const handleAddToCart = (product) => {
     if (!isLoggedIn) { setShowModal(true); return; }
+    logCustomerActivity({
+      actionType: "click",
+      productId: product._id,
+      category: product.category,
+    });
     dispatch(addToCart({ id: product._id, name: product.name, price: product.price, image: product.image, mrp: product.mrp }));
     setAddedId(product._id);
     setTimeout(() => setAddedId(null), 1200);
